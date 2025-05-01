@@ -1,0 +1,21 @@
+import time
+import serial
+from lora import LoRa
+
+# Set up the LoRa connection on the Raspberry Pi
+lora = LoRa()
+
+# Initialize LoRa and wait for any incoming messages
+def listen_for_data():
+    while True:
+        if lora.received():
+            message = lora.read()
+            print("Received message:", message)
+            # Send this message to Node-RED or directly process it
+            with serial.Serial('/dev/ttyUSB0', 9600) as ser:
+                ser.write(message.encode())
+            time.sleep(1)
+
+# Start listening for LoRa messages
+if __name__ == '__main__':
+    listen_for_data()
