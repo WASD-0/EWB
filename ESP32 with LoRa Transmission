@@ -1,0 +1,88 @@
+#include <LoRa.h>
+#include <DHT.h>
+
+// Pin definitions
+#define DHTPIN 13           // DHT22 data pin connected to GPIO13
+#define RAIN_PIN 15         // Tipping bucket connected to GPIO15
+#define ANEMOMETER_PIN 14   // Anemometer (reed switch) connected to GPIO14
+
+// LoRa settings
+#define LORA_SS 5           // LoRa Slave Select Pin
+#define LORA_RST 23         // LoRa Reset Pin
+#define LORA_DIO0 2         // LoRa DIO0 Pin
+
+// DHT sensor setup
+#define DHTTYPE DHT22
+DHT dht(DHTPIN, DHTTYPE);
+
+// Variables to store sensor data
+volatile int rainTips = 0;
+volatile int windPulses = 0;
+float temperature = 0.0;
+float humidity = 0.0;
+
+void setup() {
+  Serial.begin(115200);
+
+  // LoRa initialization
+  if (!LoRa.begin(868E6)) {  // Choose the frequency as per your region (e.g., 868 MHz)
+    Serial.println("Starting LoRa failed!");
+    while (1);
+  }
+
+  LoRa.setPins(LORA_SS, LORA_RST, LORA_DIO0);
+
+  // Initialize DHT sensor
+  dht.begin();
+
+  // Configure sensor pins
+  pinMode(RAIN_PIN, INPUT_PULLUP);
+  pinMode(ANEMOMETER_PIN, INPUT_PULLUP);
+
+  // Attach interrupts for rain gauge and anemometer pulses
+  attachInterrupt(digitalPinToInterrupt(RAIN_PIN), countRainTip, FALLING);
+  attachInterrupt(digitalPinToInterrupt(ANEMOMETER_PIN), countWindPulse, FALLING);
+}
+
+void loop() {
+  // Read DHT22 sensor data (temperature and humidity)
+  temperature = dht.readTemperature();
+  humidity = dht.readHumidity();
+
+  // Check if reading failed
+  if (isnan(temperature) || isnan(humidity)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  // Build the message to send via LoRa
+  String message = "Rain: " + String(rainTips) + " tips, ";
+  message += "Wind: " + String(windPulses) + " pulses, ";
+  message += "Temp: " + String(temperature) + "C, ";
+  message += "Humidity: " + String(humidity) + "%";
+
+  // Send data over LoRa
+  LoRa.beginPacket();
+  LoRa.print(message);
+  LoRa.endPacket();
+
+  // Output data to Serial Monitor
+  Serial.println(message);
+
+  // Reset counters for next cycle
+  rainTips = 0;
+  windPulses = 0;
+
+  // Delay before sending next packet (e.g., 10 seconds)
+  delay(10000);
+}
+
+// Interrupt function for rain gauge
+void countRainTip() {
+  rainTips++;
+}
+
+// Interrupt function for anemometer
+void countWindPulse() {
+  windPulses++;
+}
