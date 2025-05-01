@@ -1,0 +1,65 @@
+[
+  {
+    "id": "comment_input",
+    "type": "ui_text_input",
+    "z": "main",
+    "name": "",
+    "label": "Enter your comment",
+    "group": "dashboard_group",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "mode": "text",
+    "delay": 300,
+    "topic": "userComment",
+    "x": 150,
+    "y": 100,
+    "wires": [["comment_store"]]
+  },
+  {
+    "id": "comment_store",
+    "type": "function",
+    "z": "main",
+    "name": "Store Comment",
+    "func": "let comment = msg.payload;\nlet time = new Date().toLocaleString();\nmsg.payload = time + ': ' + comment;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 340,
+    "y": 100,
+    "wires": [["comment_display"]]
+  },
+  {
+    "id": "comment_display",
+    "type": "ui_text",
+    "z": "main",
+    "group": "dashboard_group",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "name": "Show Comment",
+    "label": "Latest Comment",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "x": 540,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "dashboard_group",
+    "type": "ui_group",
+    "name": "Weather Alert",
+    "tab": "dashboard_tab",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "dashboard_tab",
+    "type": "ui_tab",
+    "name": "Dashboard",
+    "icon": "dashboard",
+    "order": 1
+  }
+]
