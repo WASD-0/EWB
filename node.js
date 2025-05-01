@@ -1,0 +1,142 @@
+[
+    {
+        "id": "f3d93a70a3c2f2bb",
+        "type": "serial in",
+        "z": "b2a87b77f3c24623",
+        "name": "LoRa Serial In",
+        "serialport": "/dev/ttyUSB0",
+        "x": 120,
+        "y": 120,
+        "wires": [["4b6f5bc9cc195fc3"]]
+    },
+    {
+        "id": "4b6f5bc9cc195fc3",
+        "type": "function",
+        "z": "b2a87b77f3c24623",
+        "name": "Parse LoRa Message",
+        "func": "let msgParts = msg.payload.split(',');\nlet data = {};\nmsgParts.forEach(part => {\n    let [key, value] = part.split(':');\n    if (value) data[key.trim()] = value.trim();\n    else {\n        let [k, v] = part.split('=');\n        if (v) data[k.trim()] = v.trim();\n    }\n});\nmsg.payload = data;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 320,
+        "y": 120,
+        "wires": [["12345a72ffed215a"]]
+    },
+    {
+        "id": "12345a72ffed215a",
+        "type": "switch",
+        "z": "b2a87b77f3c24623",
+        "name": "Check Station",
+        "property": "payload.TO",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "BASE",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 520,
+        "y": 120,
+        "wires": [["aad9c9f48e9a7a0f"]]
+    },
+    {
+        "id": "aad9c9f48e9a7a0f",
+        "type": "ui_gauge",
+        "z": "b2a87b77f3c24623",
+        "name": "Wind Gauge",
+        "group": "e5f823cb9fe0f06b",
+        "order": 1,
+        "width": 6,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Wind Speed (km/h)",
+        "label": "km/h",
+        "format": "{{msg.payload.wind}}",
+        "min": "0",
+        "max": "100",
+        "x": 740,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "baea34783d6fcded",
+        "type": "ui_gauge",
+        "z": "b2a87b77f3c24623",
+        "name": "Rain Gauge",
+        "group": "e5f823cb9fe0f06b",
+        "order": 2,
+        "width": 6,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Rain (mm)",
+        "label": "mm",
+        "format": "{{msg.payload.rain}}",
+        "min": "0",
+        "max": "100",
+        "x": 740,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "2b1e54b4fd282bd7",
+        "type": "ui_text_input",
+        "z": "b2a87b77f3c24623",
+        "name": "User Comment",
+        "label": "Enter Comment",
+        "group": "e5f823cb9fe0f06b",
+        "order": 3,
+        "width": "6",
+        "height": "1",
+        "x": 740,
+        "y": 240,
+        "wires": [["ed8a1fa8f9b0cbbb"]]
+    },
+    {
+        "id": "ed8a1fa8f9b0cbbb",
+        "type": "function",
+        "z": "b2a87b77f3c24623",
+        "name": "Save Comment",
+        "func": "msg.payload = { comment: msg.payload };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 900,
+        "y": 240,
+        "wires": [["a0b43b45a0b83f8e"]]
+    },
+    {
+        "id": "a0b43b45a0b83f8e",
+        "type": "ui_text",
+        "z": "b2a87b77f3c24623",
+        "group": "e5f823cb9fe0f06b",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "Saved Comment",
+        "label": "User Comment",
+        "format": "{{msg.payload.comment}}",
+        "x": 1060,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "e5f823cb9fe0f06b",
+        "type": "ui_group",
+        "z": "",
+        "name": "Weather Station",
+        "tab": "1d8e85a21b2fe4e1",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "1d8e85a21b2fe4e1",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Weather Monitoring",
+        "icon": "dashboard",
+        "order": 1
+    }
+]
