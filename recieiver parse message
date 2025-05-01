@@ -1,0 +1,12 @@
+let msgParts = msg.payload.split(',');
+let data = {};
+msgParts.forEach(part => {
+    let [key, value] = part.split(':');
+    if (value) data[key.trim()] = value.trim();
+    else {
+        let [k, v] = part.split('=');
+        if (v) data[k.trim()] = v.trim();
+    }
+});
+msg.payload = data;
+return msg;
