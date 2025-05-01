@@ -1,0 +1,21 @@
+// npm install @influxdata/influxdb-client
+
+const { InfluxDB, Point } = require('@influxdata/influxdb-client');
+
+const token = 'your-influxdb-token';
+const org = 'your-org';
+const bucket = 'weather';
+const client = new InfluxDB({ url: 'http://localhost:8086', token });
+const writeApi = client.getWriteApi(org, bucket);
+
+function logToInflux(data) {
+  const point = new Point('weather')
+    .tag('location', 'SaibaiStation1')
+    .floatField('windSpeed', data.windSpeed)
+    .floatField('rainfall', data.rainfall)
+    .floatField('temperature', data.temperature)
+    .timestamp(new Date());
+
+  writeApi.writePoint(point);
+  writeApi.flush();
+}
