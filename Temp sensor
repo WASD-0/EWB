@@ -1,0 +1,30 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+// Data wire is connected to GPIO 13
+#define ONE_WIRE_BUS 13
+
+// Setup oneWire and temperature sensor
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+void setup() {
+  Serial.begin(115200);
+  sensors.begin();
+  Serial.println("DS18B20 Temperature Sensor Initialized");
+}
+
+void loop() {
+  sensors.requestTemperatures(); // Send command to get temperatures
+  float tempC = sensors.getTempCByIndex(0); // Get temp from first sensor
+
+  if (tempC != DEVICE_DISCONNECTED_C) {
+    Serial.print("Temperature: ");
+    Serial.print(tempC);
+    Serial.println(" °C");
+  } else {
+    Serial.println("Error: DS18B20 not detected");
+  }
+
+  delay(5000); // Wait 5 seconds before reading again
+}
