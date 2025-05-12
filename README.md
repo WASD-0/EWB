@@ -31,7 +31,7 @@ Process incoming LoRa data packets from weather stations and check against thres
 - Parse serial input from SX1278 LoRa module.
 - Convert data to readable JSON (e.g., `{ "station": "1", "temp": 29.3, "wind": 12.1 }`).
 - Publish to Node-RED Dashboard and/or store in database.
-
+- Current code in main uses csv file parse data in and displays stations data 
 Optional: Python script using `pyserial` can be used for pre-processing if not handled in Node-RED.
 
 ### 3. Data Logging
@@ -40,17 +40,10 @@ Optional: Python script using `pyserial` can be used for pre-processing if not h
 - Store time-series data for historical trends.
 - Integrates with Grafana for advanced visual analytics.
 
+
 **Installation:**
 ```bash
 sudo apt install influxdb
 sudo systemctl start influxdb
 
 
-
-back up flow multi channel delivery 
-[Sensors → ESP32] --LoRa--> [Raspberry Pi (Central Server)]
-     |
-     |---> SMS Alert via SIM800L
-     |---> Push Notification via Firebase
-     |---> Audio Alert via Speaker
-     |---> Node-RED Dashboard Visualization
